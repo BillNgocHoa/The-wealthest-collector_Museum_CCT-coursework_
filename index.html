@@ -33,6 +33,13 @@
             font-size: 16px;
             cursor: pointer;
         }
+        .link {
+            margin-top: 20px;
+            font-size: 18px;
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -40,12 +47,15 @@
         <video id="video" autoplay playsinline></video>
         <p class="message" id="message"></p>
         <button id="switchCamera">Switch Camera</button>
+        <a id="qrLink" class="link" href="#" target="_blank"></a>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
     <script>
         const videoElement = document.getElementById('video');
         const messageElement = document.getElementById('message');
         const switchCameraButton = document.getElementById('switchCamera');
+        const qrLinkElement = document.getElementById('qrLink');
         let currentFacingMode = 'environment'; // Default to back camera
 
         async function openCamera(facingMode) {
@@ -53,6 +63,7 @@
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
                 videoElement.srcObject = stream;
                 messageElement.textContent = "Camera is live.";
+                scanQRCode();
             } catch (error) {
                 console.error("Error accessing the camera:", error);
                 messageElement.textContent = "Unable to access the camera. Please check your permissions.";
@@ -63,6 +74,30 @@
             currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
             openCamera(currentFacingMode);
         });
+
+        function scanQRCode() {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            // The tick function repeatedly calls itself to scan the video stream
+            function tick() { 
+                if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+                    canvas.width = videoElement.videoWidth;
+                    canvas.height = videoElement.videoHeight;
+                    context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                    if (code) {
+                        qrLinkElement.href = code.data;
+                        qrLinkElement.textContent = code.data;
+                    }
+                }
+                requestAnimationFrame(tick);
+            }
+
+            tick(); // Start the tick function
+        }
 
         // Call the function when the page loads
         window.onload = () => openCamera(currentFacingMode);
