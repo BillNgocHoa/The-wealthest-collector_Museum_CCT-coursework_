@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scanner</title>
+    <title>Open Camera</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -57,12 +57,47 @@
         const switchCameraButton = document.getElementById('switchCamera');
         const qrLinkElement = document.getElementById('qrLink');
         let currentFacingMode = 'environment'; // Default to back camera
+        let stream;
 
         async function openCamera(facingMode) {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                messageElement.textContent = "Camera API not supported.";
+                return;
+            }
+
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
+                const constraints = {
+                    video: {
+                        facingMode: facingMode,
+                        width: { ideal: 1280 }, // Set ideal resolution
+                        height: { ideal: 720 },
+                        zoom: 1.3 // Default zoom level
+                    }
+                };
+
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const track = stream.getVideoTracks()[0];
+                const capabilities = track.getCapabilities();
+
+                // Check if zoom and focus are supported and apply them
+                if (capabilities.zoom) {
+                    track.applyConstraints({
+                        advanced: [{ zoom: 1.3 }]
+                    });
+                }
+
+                if (capabilities.focusMode) {
+                    track.applyConstraints({
+                        advanced: [{ focusMode: 'continuous' }]
+                    });
+                }
+
                 videoElement.srcObject = stream;
-                messageElement.textContent = "Camera is live. Scanning for QR codes...";
+                messageElement.textContent = "Camera is live.";
                 scanQRCode();
             } catch (error) {
                 console.error("Error accessing the camera:", error);
@@ -79,7 +114,6 @@
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
 
-            // The tick function repeatedly calls itself to scan the video stream
             function tick() {
                 if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
                     canvas.width = videoElement.videoWidth;
@@ -91,19 +125,16 @@
                     if (code) {
                         qrLinkElement.href = code.data;
                         qrLinkElement.textContent = "Open Link: " + code.data;
-                        qrLinkElement.style.display = 'block'; // Show the link element when a QR code is detected 
-                        cancelAnimationFrame(animationFrameId); // Stop scanning after detecting a code
+                        qrLinkElement.style.display = 'block'; // Show the link element when a QR code is detected
+                        window.location.href = code.data; // Open the detected link in the same window
                         messageElement.textContent = "QR Code detected!";
-                        // Open the detected link in the NEW window
-                        //window.open(code.data, '_blank'); 
-                        // Open the detected link in the SAME window
-                        window.location.href = code.data;
+                        return; // Stop scanning after detecting a code
                     }
                 }
-                animationFrameId = requestAnimationFrame(tick);
+                requestAnimationFrame(tick);
             }
 
-            let animationFrameId = requestAnimationFrame(tick); // Start the tick function
+            tick(); // Start the tick function
         }
 
         // Call the function when the page loads
