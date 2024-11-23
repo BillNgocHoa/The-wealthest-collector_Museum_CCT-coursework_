@@ -94,6 +94,10 @@
                         qrLinkElement.style.display = 'block'; // Show the link element when a QR code is detected 
                         cancelAnimationFrame(animationFrameId); // Stop scanning after detecting a code
                         messageElement.textContent = "QR Code detected!";
+                        // Open the detected link in the NEW window
+                        //window.open(code.data, '_blank'); 
+                        // Open the detected link in the SAME window
+                        window.location.href = code.data;
                     }
                 }
                 animationFrameId = requestAnimationFrame(tick);
