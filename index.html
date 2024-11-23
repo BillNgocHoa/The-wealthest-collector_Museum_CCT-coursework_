@@ -60,7 +60,25 @@
 
         async function openCamera(facingMode) {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
+                const constraints = {
+                    video: {
+                        facingMode: facingMode,
+                        zoom: 1.3 // Default zoom level
+                    }
+                };
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const track = stream.getVideoTracks()[0];
+                const capabilities = track.getCapabilities();
+
+                // Check if zoom is supported and apply it
+                if (capabilities.zoom) {
+                    const settings = track.getSettings();
+                    track.applyConstraints({
+                        advanced: [{ zoom: 1.3 }]
+                    });
+                }
+
                 videoElement.srcObject = stream;
                 messageElement.textContent = "Camera is live.";
                 scanQRCode();
