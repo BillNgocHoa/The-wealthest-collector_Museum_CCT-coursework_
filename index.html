@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Camera</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f3f3f3;
+        }
+        video {
+            width: 100%;
+            max-width: 500px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+        .message {
+            color: #333;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <video id="video" autoplay playsinline></video>
+        <p class="message" id="message"></p>
+    </div>
+
+    <script>
+        // Automatically opens the camera when the page loads
+        const videoElement = document.getElementById('video');
+        const messageElement = document.getElementById('message');
+
+        async function openCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+                messageElement.textContent = "Camera is live.";
+            } catch (error) {
+                console.error("Error accessing the camera:", error);
+                messageElement.textContent = "Unable to access the camera. Please check your permissions.";
+            }
+        }
+
+        // Call the function when the page loads
+        window.onload = openCamera;
+    </script>
+</body>
+</html>
