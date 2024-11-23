@@ -95,7 +95,8 @@
                         //window.open(code.data, '_blank'); 
                         // Open the detected link in the same window
                         window.location.href = code.data;
-
+                        cancelAnimationFrame(animationFrameId); // Stop scanning after detecting a code
+                        messageElement.textContent = "QR Code detected!";
                     }
                 }
                 requestAnimationFrame(tick);
