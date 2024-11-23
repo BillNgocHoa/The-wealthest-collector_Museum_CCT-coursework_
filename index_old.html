@@ -69,8 +69,6 @@
                 const constraints = {
                     video: {
                         facingMode: facingMode,
-                        width: { ideal: 1280 }, // Set ideal resolution
-                        height: { ideal: 720 },
                         zoom: 1.3 // Default zoom level
                     }
                 };
@@ -83,16 +81,10 @@
                 const track = stream.getVideoTracks()[0];
                 const capabilities = track.getCapabilities();
 
-                // Check if zoom and focus are supported and apply them
+                // Check if zoom is supported and apply it
                 if (capabilities.zoom) {
                     track.applyConstraints({
                         advanced: [{ zoom: 1.3 }]
-                    });
-                }
-
-                if (capabilities.focusMode) {
-                    track.applyConstraints({
-                        advanced: [{ focusMode: 'continuous' }]
                     });
                 }
 
