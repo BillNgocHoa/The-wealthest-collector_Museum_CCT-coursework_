@@ -24,8 +24,9 @@
             border-radius: 10px;
         }
         .message {
-            color: #333;
-            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+            font-size: 20px;
         }
         button {
             margin-top: 20px;
@@ -93,7 +94,7 @@
                         qrLinkElement.textContent = "Open Link: " + code.data;
                         qrLinkElement.style.display = 'block'; // Show the link element when a QR code is detected 
                         cancelAnimationFrame(animationFrameId); // Stop scanning after detecting a code
-                        messageElement.textContent = "QR Code detected!";
+                        messageElement.textContent = "QR Code detected!\nRedirecting to the website!\nPlease wait...";
                         // Open the detected link in the NEW window
                         //window.open(code.data, '_blank'); 
                         // Open the detected link in the SAME window
