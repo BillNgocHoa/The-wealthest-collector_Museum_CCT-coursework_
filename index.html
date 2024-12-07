@@ -94,7 +94,7 @@
                         qrLinkElement.textContent = "Open Link: " + code.data;
                         qrLinkElement.style.display = 'block'; // Show the link element when a QR code is detected 
                         cancelAnimationFrame(animationFrameId); // Stop scanning after detecting a code
-                        messageElement.textContent = "QR Code detected!\nRedirecting to the website!\nPlease wait...";
+                        messageElement.textContent = "QR Code detected! Redirecting to the website! Please wait...";
                         // Open the detected link in the NEW window
                         //window.open(code.data, '_blank'); 
                         // Open the detected link in the SAME window
